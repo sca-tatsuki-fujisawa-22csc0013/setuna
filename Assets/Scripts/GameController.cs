@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class GameController : MonoBehaviour
 {
@@ -11,6 +12,7 @@ public class GameController : MonoBehaviour
         wait,
         play,
         judge,
+        end,
     };
 
     private enum Result
@@ -26,23 +28,33 @@ public class GameController : MonoBehaviour
     bool chack;
     int frameCount;
     int nowFrame;
-    [SerializeField] Text frameText;
+    [SerializeField] Text TimeText;
     [SerializeField] Image[] judgeImage;
-    [SerializeField] GameObject[] Enemy;
+    [SerializeField] Text[] PointText;
+    [SerializeField] Text _text;
+
+    [SerializeField] Image[] PImage;
+    [SerializeField] Image[] EImage;
+
+    int EScore;
+    int PScore;
+    int GamePoint;
+
+    int _1POtetuki;
+    int _2POtetuki;
 
 
     // Start is called before the first frame update
     void Start()
     {
         state = Game.start;
-        if (Title.Select == 1)
-        {
-            Enemy[1].SetActive(false);
-        }
-        else if(Title.Select == 2)
-        {
-            Enemy[0].SetActive(false);
-        }
+        EScore = 0;
+        PScore = 0;
+        GamePoint = 0;
+        PointText[0].text = PScore.ToString();
+        PointText[1].text = EScore.ToString();
+        _1POtetuki = 0;
+        _2POtetuki = 0;
     }
 
     // Update is called once per frame
@@ -61,6 +73,8 @@ public class GameController : MonoBehaviour
                 break;
             case Game.judge:
                 break;
+            case Game.end:
+                break;
         }
     }
 
@@ -68,10 +82,16 @@ public class GameController : MonoBehaviour
     {
         chack = false;
         frameCount = 0;
-        frameText.text = "";
+        TimeText.text = "";
+        _text.text = "";
         for (int i = 0; i < 3; ++i)
         {
             judgeImage[i].enabled = false;
+        }
+        for(int i = 0; i < 2; ++i)
+        {
+            PImage[i].enabled = false;
+            EImage[i].enabled = false;
         }
         state = Game.wait;
     }
@@ -80,21 +100,53 @@ public class GameController : MonoBehaviour
     {
         if (!chack)
         {
-            waitTime = Random.Range(1.0f, 1.5f);
+            waitTime = Random.Range(1.0f, 2.0f);
             chack = true;
+            player.play = false;
+            enemy.play = false;
         }
         waitTime -= Time.deltaTime;
-        if(waitTime < 0.0f)
+        if (waitTime > 0.0f)
         {
+            if (Title.Select == 2)
+            {
+                if (Input.GetKeyDown(KeyCode.Return))
+                {
+                    ++_2POtetuki;
+                    _text.text = "お手付き！";
+                    if (_2POtetuki == 2)
+                    {
+                        _2POtetuki = 0;
+                        player.play = true;
+                    }
+                    state = Game.judge;
+                    StartCoroutine(judge());
+                    return;
+                }
+            }
+            if (Input.GetKeyDown(KeyCode.A))
+            {
+                ++_1POtetuki;
+                _text.text = "お手付き！";
+                if (_1POtetuki == 2)
+                {
+                    _1POtetuki = 0;
+                    enemy.play = true;
+                }
+                state = Game.judge;
+                StartCoroutine(judge());
+                return;
+            }
+        }
+        if (waitTime <= 0.0f)
+        {
+            TimeText.text = "!";
             state = Game.play;
-            nowFrame = Time.frameCount;
         }
     }
 
     void play()
     {
-        frameCount = Time.frameCount - nowFrame;
-        frameText.text = frameCount.ToString();
         if(player.play == true || enemy.play == true)
         {
             state = Game.judge;
@@ -105,11 +157,7 @@ public class GameController : MonoBehaviour
     IEnumerator judge()
     {
         var result = Result.Draw;
-        if(player.play == true && enemy.play == true)
-        {
-            result = Result.Draw;
-        }
-        else if (player.play == true && enemy.play == false)
+        if (player.play == true && enemy.play == false)
         {
             result = Result.Win;
         }
@@ -117,21 +165,88 @@ public class GameController : MonoBehaviour
         {
             result = Result.Lose;
         }
+        else if (player.play == true && enemy.play == true)
+        {
+            result = Result.Draw;
+        }
 
-        if (result == Result.Draw)
+        if (result == Result.Win)
         {
             judgeImage[0].enabled = true;
-        }
-        else if (result == Result.Win)
-        {
-            judgeImage[1].enabled = true;
+            PImage[0].enabled = true;
+            EImage[1].enabled = true;
+            ++PScore;
+            PointText[0].text = PScore.ToString();
+            ++GamePoint;
         }
         else if (result == Result.Lose)
         {
-            judgeImage[2].enabled = true;
+            judgeImage[1].enabled = true;
+            PImage[1].enabled = true;
+            EImage[0].enabled = true;
+            ++EScore;
+            PointText[1].text = EScore.ToString();
+            ++GamePoint;
         }
-        yield return new WaitForSeconds(0.5f);
+        else if (result == Result.Draw)
+        {
+            judgeImage[2].enabled = true;
+            PImage[1].enabled = true;
+            EImage[1].enabled = true;
+        }
+            yield return new WaitForSeconds(0.8f);
 
-        state = Game.start;
+        if (GamePoint == 7)
+        {
+            for (int i = 0; i < 2; ++i)
+            {
+                PImage[i].enabled = false;
+                EImage[i].enabled = false;
+            }
+            if (Title.Select == 1)
+            {
+                if (PScore > EScore)
+                {
+                    _text.text = "プレイヤーの勝ち！";
+                }
+                else
+                {
+                    _text.text = "CPUの勝ち！";
+                }
+            }
+            else
+            {
+                if (PScore > EScore)
+                {
+                    _text.text = "1Pの勝ち！";
+                }
+                else
+                {
+                    _text.text = "2Pの勝ち！";
+                }
+            }
+
+            if (PScore > EScore)
+            {
+                PImage[0].enabled = true;
+                EImage[1].enabled = true;
+            }
+            else
+            {
+                PImage[1].enabled = true;
+                EImage[0].enabled = true;
+            }
+            StartCoroutine(EndWave());
+        }
+        else
+        {
+            state = Game.start;
+        }
+    }
+
+    IEnumerator EndWave()
+    {
+        yield return new WaitForSeconds(1.0f);
+        SceneManager.LoadScene("TitleScene");
     }
 }

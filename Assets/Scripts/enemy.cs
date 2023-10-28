@@ -6,60 +6,56 @@ public class enemy : MonoBehaviour
 {
     [SerializeField] GameController gameController;
     public static bool play;
-    int waitFrame;
+    float waitTime;
     bool wait;
-    int nowFrame;
     
     void Start()
     {
-        
+        play = false;
     }
 
     void Update()
     {
-        switch (Title.Select)
+        if (gameController.State == GameController.Game.wait)
         {
-            case 1:
-                CPU();
-                break;
-            case 2:
-                OnPlay();
-                break;
-        }
-        if (gameController.State == GameController.Game.start)
-        {
-            play = false;
+            //play = false;
             wait = false;
-            waitFrame = 0;
+            waitTime = 0;
+        }
+        else if (gameController.State == GameController.Game.play)
+        {
+            switch (Title.Select)
+            {
+                case 1:
+                    if (!wait)
+                    {
+                        wait = true;
+                        waitTime = Random.Range(0.21f, 0.23f);
+                        Debug.Log(waitTime);
+                    }
+                    CPU();
+                    break;
+                case 2:
+                    OnPlay();
+                    break;
+            }
         }
     }
 
     private void CPU()
     {
-        if (gameController.State == GameController.Game.play)
+        waitTime -= Time.deltaTime;
+        if (waitTime <= 0.0f)
         {
-            if (!wait)
-            {
-                wait = true;
-                waitFrame = Random.Range(15,46);
-                nowFrame = Time.frameCount;
-            }
-            if (waitFrame <= Time.frameCount - nowFrame)
-            {
-                play = true;
-                wait = false;
-            }
+            play = true;
         }
     }
 
     private void OnPlay()
     {
-        if (gameController.State == GameController.Game.play)
+        if (Input.GetKeyDown(KeyCode.Return))
         {
-            if (Input.GetKeyDown(KeyCode.Return))
-            {
-                play = true;
-            }
+            play = true;
         }
     }
 }

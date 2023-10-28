@@ -9,23 +9,21 @@ public class player : MonoBehaviour
 
     void Start()
     {
-        
+        play = false;
     }
 
     void Update()
     {
-        if(gameController.State == GameController.Game.play)
+        //if (gameController.State == GameController.Game.wait)
+        //{
+        //    play = false;
+        //}
+        if (gameController.State == GameController.Game.play)
         {
             if (Input.GetKeyDown(KeyCode.A))
             {
                 play = true;
             }
-        }
-
-        if (gameController.State == GameController.Game.start)
-        {
-            Debug.Log("start");
-            play = false;
         }
     }
 }

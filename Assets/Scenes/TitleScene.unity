@@ -835,7 +835,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8e94a8f4934951e44b1cd5064bc5eeb7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Select: 0
+  Select: 1
 --- !u!1 &1539856373
 GameObject:
   m_ObjectHideFlags: 0
@@ -970,7 +970,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8e94a8f4934951e44b1cd5064bc5eeb7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Select: 1
+  Select: 2
 --- !u!1 &1653949558
 GameObject:
   m_ObjectHideFlags: 0
