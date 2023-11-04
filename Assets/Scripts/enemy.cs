@@ -30,7 +30,7 @@ public class enemy : MonoBehaviour
                     if (!wait)
                     {
                         wait = true;
-                        waitTime = Random.Range(0.21f, 0.23f);
+                        waitTime = Random.Range(0.22f, 0.235f);
                         Debug.Log(waitTime);
                     }
                     CPU();

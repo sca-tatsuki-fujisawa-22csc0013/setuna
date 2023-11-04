@@ -43,6 +43,9 @@ public class GameController : MonoBehaviour
     int _1POtetuki;
     int _2POtetuki;
 
+    [SerializeField] AudioClip[] Sounds;
+    AudioSource _audio;
+
 
     // Start is called before the first frame update
     void Start()
@@ -55,6 +58,7 @@ public class GameController : MonoBehaviour
         PointText[1].text = EScore.ToString();
         _1POtetuki = 0;
         _2POtetuki = 0;
+        _audio = GetComponent<AudioSource>();
     }
 
     // Update is called once per frame
@@ -93,6 +97,7 @@ public class GameController : MonoBehaviour
             PImage[i].enabled = false;
             EImage[i].enabled = false;
         }
+        _audio.PlayOneShot(Sounds[4]);
         state = Game.wait;
     }
 
@@ -112,6 +117,7 @@ public class GameController : MonoBehaviour
             {
                 if (Input.GetKeyDown(KeyCode.Return))
                 {
+                    _audio.PlayOneShot(Sounds[0]);
                     ++_2POtetuki;
                     _text.text = "お手付き！";
                     if (_2POtetuki == 2)
@@ -126,6 +132,7 @@ public class GameController : MonoBehaviour
             }
             if (Input.GetKeyDown(KeyCode.A))
             {
+                _audio.PlayOneShot(Sounds[0]);
                 ++_1POtetuki;
                 _text.text = "お手付き！";
                 if (_1POtetuki == 2)
@@ -178,6 +185,7 @@ public class GameController : MonoBehaviour
             ++PScore;
             PointText[0].text = PScore.ToString();
             ++GamePoint;
+            _audio.PlayOneShot(Sounds[1]);
         }
         else if (result == Result.Lose)
         {
@@ -187,14 +195,22 @@ public class GameController : MonoBehaviour
             ++EScore;
             PointText[1].text = EScore.ToString();
             ++GamePoint;
+            _audio.PlayOneShot(Sounds[2]);
         }
         else if (result == Result.Draw)
         {
             judgeImage[2].enabled = true;
             PImage[1].enabled = true;
             EImage[1].enabled = true;
+            _audio.PlayOneShot(Sounds[0]);
         }
             yield return new WaitForSeconds(0.8f);
+
+        _audio.PlayOneShot(Sounds[3]);
+        if (result == Result.Draw)
+        {
+            _audio.PlayOneShot(Sounds[3]);
+        }
 
         if (GamePoint == 7)
         {
