@@ -44,7 +44,7 @@ public class GameController : MonoBehaviour
     int _2POtetuki;
 
     [SerializeField] AudioClip[] Sounds;
-    AudioSource _audio;
+    [SerializeField] AudioSource _audio;
 
     [SerializeField] GameObject button;
     [SerializeField] Text _Text;
@@ -166,6 +166,7 @@ public class GameController : MonoBehaviour
         if (waitTime <= 0.0f)
         {
             TimeText.text = "!";
+            _audio.PlayOneShot(Sounds[5]);
             state = Game.play;
         }
     }
