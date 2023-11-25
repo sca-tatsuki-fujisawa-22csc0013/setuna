@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class enemy : MonoBehaviour
 {
@@ -8,7 +9,9 @@ public class enemy : MonoBehaviour
     public static bool play;
     float waitTime;
     bool wait;
-    
+    private GameController _GC;
+    [SerializeField] Text tx;
+
     void Start()
     {
         play = false;
@@ -30,8 +33,20 @@ public class enemy : MonoBehaviour
                     if (!wait)
                     {
                         wait = true;
-                        waitTime = Random.Range(0.22f, 0.235f);
-                        Debug.Log(waitTime);
+                        _GC = GameObject.Find("GameController").GetComponent<GameController>();
+                        if (_GC.EScore < _GC.PScore)
+                        {
+                            waitTime = Random.Range(0.225f, 0.235f);
+                        }
+                        else if (_GC.EScore == _GC.PScore)
+                        {
+                            waitTime = Random.Range(0.235f, 0.24f);
+                        }
+                        else if (_GC.EScore > _GC.PScore)
+                        {
+                            waitTime = Random.Range(0.24f, 0.245f);
+                        }
+                        tx.text = waitTime.ToString("f3");
                     }
                     CPU();
                     break;
@@ -44,10 +59,14 @@ public class enemy : MonoBehaviour
 
     private void CPU()
     {
-        waitTime -= Time.deltaTime;
-        if (waitTime <= 0.0f)
+        if (player.play == false)
         {
-            play = true;
+            waitTime -= Time.deltaTime;
+            tx.text = waitTime.ToString("f3");
+            if (waitTime <= 0.0f)
+            {
+                play = true;
+            }
         }
     }
 

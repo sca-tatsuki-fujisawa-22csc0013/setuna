@@ -36,8 +36,8 @@ public class GameController : MonoBehaviour
     [SerializeField] Image[] PImage;
     [SerializeField] Image[] EImage;
 
-    int EScore;
-    int PScore;
+    public int EScore;
+    public int PScore;
     int GamePoint;
 
     int _1POtetuki;
@@ -46,8 +46,23 @@ public class GameController : MonoBehaviour
     [SerializeField] AudioClip[] Sounds;
     AudioSource _audio;
 
+    [SerializeField] GameObject button;
+    [SerializeField] Text _Text;
+    [SerializeField] Text[] PointTextBack;
+    [SerializeField] Text _timetext;
+
 
     // Start is called before the first frame update
+    private void Awake()
+    {
+        _Text.text = "";
+        _timetext.text = "";
+        for(int i = 0;i < 2; ++i)
+        {
+            PointTextBack[i].text = PointText[i].text;
+        }
+    }
+
     void Start()
     {
         state = Game.start;
@@ -59,11 +74,14 @@ public class GameController : MonoBehaviour
         _1POtetuki = 0;
         _2POtetuki = 0;
         _audio = GetComponent<AudioSource>();
+        button.SetActive(false);
     }
 
     // Update is called once per frame
     void Update()
     {
+        _Text.text = _text.text;
+        _timetext.text = TimeText.text;
         switch (state)
         {
             case Game.start:
@@ -105,7 +123,7 @@ public class GameController : MonoBehaviour
     {
         if (!chack)
         {
-            waitTime = Random.Range(1.0f, 2.0f);
+            waitTime = Random.Range(1.5f, 3.0f);
             chack = true;
             player.play = false;
             enemy.play = false;
@@ -184,6 +202,7 @@ public class GameController : MonoBehaviour
             EImage[1].enabled = true;
             ++PScore;
             PointText[0].text = PScore.ToString();
+            PointTextBack[0].text = PointText[0].text;
             ++GamePoint;
             _audio.PlayOneShot(Sounds[1]);
         }
@@ -194,6 +213,7 @@ public class GameController : MonoBehaviour
             EImage[0].enabled = true;
             ++EScore;
             PointText[1].text = EScore.ToString();
+            PointTextBack[1].text = PointText[1].text;
             ++GamePoint;
             _audio.PlayOneShot(Sounds[2]);
         }
@@ -202,6 +222,10 @@ public class GameController : MonoBehaviour
             judgeImage[2].enabled = true;
             PImage[1].enabled = true;
             EImage[1].enabled = true;
+            if (_text.text != "Ç®éËïtÇ´ÅI")
+            {
+                _text.text = "å‰å©çá";
+            }
             _audio.PlayOneShot(Sounds[0]);
         }
             yield return new WaitForSeconds(0.8f);
@@ -256,13 +280,27 @@ public class GameController : MonoBehaviour
         }
         else
         {
+            yield return new WaitForSeconds(0.5f);
             state = Game.start;
         }
     }
 
     IEnumerator EndWave()
     {
-        yield return new WaitForSeconds(1.0f);
-        SceneManager.LoadScene("TitleScene");
+        yield return new WaitForSeconds(1.5f);
+        button.SetActive(true);
+    }
+
+    public void GameEnd(int num)
+    {
+        switch (num)
+        {
+            case 1:
+                SceneManager.LoadScene("MainScene");
+                break;
+            case 2:
+                SceneManager.LoadScene("TitleScene");
+                break;
+        }
     }
 }
